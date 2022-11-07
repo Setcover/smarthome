@@ -1,7 +1,7 @@
 # smarthome
 MQTT Telegraf Influx Grafana HomeAssistant
 
-# To get up and running
+## To get up and running
 ```
 sudo apt update
 sudo apt install git docker docker-compose
