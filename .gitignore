@@ -1,0 +1,13 @@
+!README.md
+!docker-compose.yml
+!influx/config/influxdb.conf
+influx/data/
+!mosquitto/config/mosquitto.conf
+mosquitto/data/
+mosquitto/log/
+!mqttexplorer/settings.json
+telegraf/*
+!telegraf/telegraf.conf
+chronograf/
+homeassistant/
+grafana/

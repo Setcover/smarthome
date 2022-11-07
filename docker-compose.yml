@@ -1,0 +1,118 @@
+version: "3.3"
+
+services:
+
+  # fritzexport:
+  #   image: jaymedh/fritzbox_smarthome_exporter:v0.0.8
+  #   container_name: fritzexport
+  #   restart: unless-stopped
+  #   ports:
+  #   - 9103:9103
+  #   volumes:
+  #   - ./boxcert.cer:/fritzbox.pem:ro
+  #   environment:
+  #     - USERNAME=user # maybe change this
+  #     - PASSWORD=password # maybe change this
+  #     - url="https://fritz.box:8443" 
+  #     - CERT=/fritzbox.pem
+  #     - NOVERIFY=false
+  
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  mqttexplorer:
+    image: smeagolworms4/mqtt-explorer
+    container_name: mqttexplorer
+    restart: unless-stopped
+    ports:
+      - 4000:4000
+    volumes:
+      - ./mqttexplorer:/mqtt-explorer/config
+    environment:
+      - HTTP_PORT=4000
+      - CONFIG_PATH=/mqtt-explorer/config
+
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: unless-stopped
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+    depends_on:
+      - mosquitto
+      - influxdb
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+    volumes:
+      - ./influx/data:/var/lib/influxdb
+      - ./influx/config:/etc/influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=my-user # maybe change this here and in telegraf.conf line 12/13
+      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password # maybe change this here and in telegraf.conf line 12/13
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+      # - DOCKER_INFLUXDB_INIT_RETENTION=1w
+
+  chronograf: # gui for influxdb 
+    image: chronograf
+    container_name: chronograf
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    volumes:
+    - ./chronograf:/var/lib/chronograf
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: unless-stopped
+    user: "1000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    depends_on:
+      - influxdb
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+      GF_DATE_FORMATS_INTERVAL_HOUR: "DD.MM. HH:mm"
+      GF_DATE_FORMATS_INTERVAL_DAY: "DD.MM."
+
+  renderer: #for grafana
+    # image: grafana/grafana-image-renderer:3.5.0 # use this on a regular pc / server
+    image: adejong/grafana-image-renderer-pi:1.0.8-beta2 # use this on a raspberry pi
+    container_name: renderer
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - ./homeassistant/.ssh:/root/.ssh
+    restart: unless-stopped
+    # privileged: true
+    # network_mode: host
+    ports:
+      - "8123:8123"
