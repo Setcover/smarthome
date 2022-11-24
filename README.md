@@ -22,5 +22,5 @@ sudo docker-compose pull # to update
 sudo docker-compose start containername
 sudo docker-compose stop containername
 sudo docker-compose restart containername
-sudo docker-compose up -d --force-recreate
+sudo docker-compose up -d --force-recreate (containername)
 ```
