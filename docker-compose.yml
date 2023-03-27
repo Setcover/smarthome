@@ -52,7 +52,10 @@ services:
       - influxdb
 
   influxdb:
-    image: influxdb:1.8
+    # image: influxdb:1.8
+    image: ghcr.io/terjesannum/influxdb-arm32:1.8.10-1 # included are fixes for 32bit memory limitations, see
+    # https://github.com/influxdata/influxdb/pull/12362
+    # https://github.com/terjesannum/docker-influxdb-arm32
     container_name: influxdb
     restart: unless-stopped
     ports:
