@@ -2,6 +2,21 @@ version: "3.3"
 
 services:
 
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:arm32v7-2.5.6
+    # image: lscr.io/linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./heimdall:/config
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+
   # fritzexport:
   #   image: jaymedh/fritzbox_smarthome_exporter:v0.0.8
   #   container_name: fritzexport
