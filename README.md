@@ -12,7 +12,7 @@ You might need to replace "docker" with "docker.io". When? Whenever apt complain
 
 Look through all the files including subdirectories, comment or uncomment configuration as needed, maybe change the default password in `docker-compose.yml` and `telegraf/telegraf.conf`.
 
-**Everything should work on a raspberry pi and on a pc, except "renderer", "heimdall" and "influxdb". For those containers two images are present in the docker-compose.yml you have to select the correct one. (the one containing "arm" is for Raspberry Pi)**
+**Everything should work on a raspberry pi and on a pc, except "heimdall" and "influxdb". For those containers two images are present in the docker-compose.yml you have to select the correct one. (the one containing "arm" is for Raspberry Pi)**
 
 When reasonably confident, start everything using `sudo docker-compose up -d`. You can check the logs using `sudo docker logs containername`.
 
