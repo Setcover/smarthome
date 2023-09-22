@@ -116,7 +116,8 @@ services:
 
   renderer: #for grafana
     # image: grafana/grafana-image-renderer:3.5.0 # use this on a regular pc / server
-    image: adejong/grafana-image-renderer-pi:1.0.8-beta2 # use this on a raspberry pi
+    # image: adejong/grafana-image-renderer-pi:1.0.8-beta2 # use this on a raspberry pi (did encounter problem on pi3 + grafana v10)
+    image: betashil/grafana-image-renderer # should work on raspberry pi (arm) / arm64 and regular 64bit pc (amd64)
     container_name: renderer
     restart: unless-stopped
     ports:
